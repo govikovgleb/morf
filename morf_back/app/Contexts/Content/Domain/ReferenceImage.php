@@ -31,6 +31,19 @@ class ReferenceImage extends Model
         'file_size_bytes' => 'integer',
     ];
 
+    protected function cdnUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: function (string $value) {
+                if (str_starts_with($value, 'http')) {
+                    return $value;
+                }
+
+                return rtrim(config('app.url'), '/').$value;
+            },
+        );
+    }
+
     public function category()
     {
         return $this->belongsTo(ReferenceCategory::class, 'category_id');

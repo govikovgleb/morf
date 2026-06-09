@@ -45,6 +45,19 @@ class Artwork extends Model
         'deleted_at' => 'datetime',
     ];
 
+    protected function cdnUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: function (string $value) {
+                if (str_starts_with($value, 'http')) {
+                    return $value;
+                }
+
+                return rtrim(config('app.url'), '/').$value;
+            },
+        );
+    }
+
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved');
