@@ -319,13 +319,30 @@ docker compose build --no-cache app
 
 ### Картинки не грузятся
 
-```bash
-# Проверь symlink
-docker compose exec app ls -la public/storage
+**API возвращает правильный URL, но картинки 404:**
 
-# Пересоздай
+```bash
+# 1. Проверь symlink
+docker compose exec app ls -la public/storage
+# Должно быть: public/storage -> /var/www/html/storage/app/public
+
+# 2. Проверь что файлы есть в volume
+docker compose exec app ls -la storage/app/public/reference_images/
+docker compose exec app ls -la storage/app/public/artworks/
+
+# 3. Проверь что Nginx отдаёт файл напрямую
+curl -I http://91.227.68.182:8080/storage/reference_images/XXX.jpg
+# Должен вернуть 200 OK, а не 404
+
+# 4. Пересоздай symlink (если не создан)
 docker compose exec app php artisan storage:link
+
+# 5. Проверь права
+docker compose exec app chown -R www-data:www-data storage/app/public
 ```
+
+**Если картинки грузятся с порта 3000 вместо 8080:**
+Значит React Query закешировал старые данные. Обнови страницу браузера (`Ctrl+Shift+R`).
 
 ---
 
