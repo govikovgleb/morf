@@ -298,6 +298,25 @@ docker compose down -v
 docker compose up -d --build
 ```
 
+### Сборка backend падает на `composer install`
+
+**Ошибка:** `Could not open input file: artisan`
+
+**Причина:** `composer install` запускает `post-autoload-dump` скрипт, который вызывает `php artisan package:discover`, но файл `artisan` копируется позже.
+
+**Решение:** обнови `docker/php/Dockerfile` из последнего коммита — там `composer install` запускается с флагами `--no-scripts --no-autoloader`, а `dump-autoload` выполняется после копирования всего кода:
+
+```dockerfile
+RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction
+COPY morf_back .
+RUN composer dump-autoload --optimize
+```
+
+Если ошибка повторяется — попробуй собрать с увеличенным лимитом памяти:
+```bash
+docker compose build --no-cache app
+```
+
 ### Картинки не грузятся
 
 ```bash
