@@ -6,6 +6,11 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
+ARG API_HOST=web
+ARG API_PORT=80
+ENV API_HOST=${API_HOST}
+ENV API_PORT=${API_PORT}
+
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
