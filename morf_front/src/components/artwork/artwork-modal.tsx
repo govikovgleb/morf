@@ -59,7 +59,7 @@ export function ArtworkModal({ artwork, open, onOpenChange }: ArtworkModalProps)
           {/* Image */}
           <div className="relative md:w-2/3 aspect-square md:aspect-auto">
             <img
-              src={artwork.cdn_url.replace("localhost:8080", "localhost:3000")}
+              src={artwork.cdn_url}
               alt={artwork.caption || `Artwork by ${artwork.author_nickname}`}
               className="w-full h-full object-contain bg-bg-primary"
             />

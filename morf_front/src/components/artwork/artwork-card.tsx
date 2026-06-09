@@ -48,7 +48,7 @@ export function ArtworkCard({ artwork, onClick }: ArtworkCardProps) {
     >
       <div className="relative aspect-[3/4]">
         <img
-          src={artwork.cdn_url.replace("localhost:8080", "localhost:3000")}
+          src={artwork.cdn_url}
           alt={artwork.caption || `Artwork by ${artwork.author_nickname}`}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />

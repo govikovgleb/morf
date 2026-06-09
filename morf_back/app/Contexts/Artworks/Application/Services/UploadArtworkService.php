@@ -14,8 +14,8 @@ class UploadArtworkService
 {
     public function execute(UploadArtworkDto $dto): Artwork
     {
-        $path = $dto->file->store('artworks', 's3');
-        $cdnUrl = Storage::disk('s3')->url($path);
+        $path = $dto->file->store('artworks', 'public');
+        $cdnUrl = Storage::disk('public')->url($path);
 
         [$width, $height] = getimagesize($dto->file->getRealPath()) ?: [null, null];
 

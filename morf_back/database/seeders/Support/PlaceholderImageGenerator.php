@@ -75,7 +75,7 @@ class PlaceholderImageGenerator
 
     private function publicUrl(string $relativePath): string
     {
-        return config('app.url').'/storage/'.$relativePath;
+        return '/storage/'.$relativePath;
     }
 
     private function fontPath(): ?string

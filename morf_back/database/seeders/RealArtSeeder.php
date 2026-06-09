@@ -75,7 +75,7 @@ class RealArtSeeder extends Seeder
                     ReferenceImage::create([
                         'id' => $id,
                         'category_id' => $category->id,
-                        'cdn_url' => config('app.url').'/storage/'.$destPath,
+                        'cdn_url' => '/storage/'.$destPath,
                         'storage_path' => $destPath,
                         'width' => $width,
                         'height' => $height,
@@ -124,7 +124,7 @@ class RealArtSeeder extends Seeder
                         'reference_set_id' => $set->id,
                         'status' => 'approved',
                         'caption' => null,
-                        'cdn_url' => config('app.url').'/storage/'.$destPath,
+                        'cdn_url' => '/storage/'.$destPath,
                         'storage_path' => $destPath,
                         'width' => $width,
                         'height' => $height,

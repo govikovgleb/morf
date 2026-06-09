@@ -82,7 +82,7 @@ export default function Home() {
                 >
                   <div className="relative aspect-[4/3]">
                     <img
-                      src={item.reference_image.cdn_url.replace("localhost:8080", "localhost:3000")}
+                      src={item.reference_image.cdn_url}
                       alt={`Reference ${item.reference_image.id}`}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />

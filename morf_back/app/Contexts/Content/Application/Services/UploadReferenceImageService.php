@@ -12,8 +12,8 @@ class UploadReferenceImageService
 {
     public function execute(UploadedFile $file, string $categoryId, ?string $uploadedBy = null): ReferenceImage
     {
-        $path = $file->store('references', 's3');
-        $cdnUrl = Storage::disk('s3')->url($path);
+        $path = $file->store('references', 'public');
+        $cdnUrl = Storage::disk('public')->url($path);
 
         [$width, $height] = getimagesize($file->getRealPath()) ?: [null, null];
 
