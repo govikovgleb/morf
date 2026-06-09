@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Gothic Colors */
+  --color-bg-primary: #0a0a0f;
+  --color-bg-surface: #14141f;
+  --color-bg-surface-elevated: #1e1e2e;
+  --color-accent: #8b0000;
+  --color-accent-hover: #a00000;
+  --color-accent-glow: rgba(139, 0, 0, 0.3);
+  --color-text-primary: #e2e2e2;
+  --color-text-secondary: #8b8b9a;
+  --color-border: #2a2a3a;
+  --color-border-hover: #3a3a4a;
+  
+  /* Fonts */
+  --font-cinzel: var(--font-cinzel);
+  --font-inter: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Breakpoints */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+}
+
+/* Base styles */
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-cinzel), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Glow effect utility */
+.glow-accent {
+  box-shadow: 0 0 10px var(--color-accent-glow), 0 0 20px var(--color-accent-glow);
+}
+
+/* Gothic border utility */
+.gothic-border {
+  border: 1px solid var(--color-border);
+}
+
+/* Active state for touch devices */
+@media (hover: none) {
+  .hover\:glow-accent:hover {
+    box-shadow: none;
+  }
+  
+  .active\:glow-accent:active {
+    box-shadow: 0 0 10px var(--color-accent-glow), 0 0 20px var(--color-accent-glow);
+  }
+}

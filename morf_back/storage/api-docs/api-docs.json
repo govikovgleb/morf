@@ -1,0 +1,524 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Morf API",
+        "description": "API for the Morf community — weekly reference sets, artwork uploads, likes, and moderation.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "Local development server"
+        }
+    ],
+    "paths": {
+        "/artworks": {
+            "get": {
+                "summary": "Global artwork feed (approved only)",
+                "operationId": "ecfc104cd09cd3784f1721371cb26ffd",
+                "parameters": [
+                    {
+                        "name": "reference_set_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated artworks"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Upload a new artwork",
+                "operationId": "c4a8b61ea457e275de61ba9a07155ff2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "reference_set_id",
+                                    "image"
+                                ],
+                                "properties": {
+                                    "reference_set_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "caption": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Artwork created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "deviceToken": []
+                    }
+                ]
+            }
+        },
+        "/artworks/{id}": {
+            "get": {
+                "summary": "Get single approved artwork",
+                "operationId": "5b4aa2c3b12eaa81e971b50fad1644cd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Artwork details"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Soft delete an artwork",
+                "operationId": "c80bcb2f1984575ef2e2ee22ada8df61",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "deviceToken": []
+                    }
+                ]
+            }
+        },
+        "/reference-images": {
+            "get": {
+                "summary": "List reference images",
+                "operationId": "6d9e6dd3e2dd047e8efce53712a9dfad",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of images"
+                    }
+                }
+            }
+        },
+        "/reference-sets": {
+            "get": {
+                "summary": "List published reference sets",
+                "operationId": "d1e1b39a08c4897d350bdcb88f2d3294",
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of sets"
+                    }
+                }
+            }
+        },
+        "/reference-sets/{id}": {
+            "get": {
+                "summary": "Get a single reference set with images",
+                "operationId": "e3b3996283082325a992fd43b532024c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reference set details"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/artworks/{artwork_id}/likes": {
+            "post": {
+                "summary": "Toggle like on an artwork",
+                "operationId": "bed7b21c5c8609e60fa439fd9131f249",
+                "parameters": [
+                    {
+                        "name": "artwork_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like toggled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "liked": {
+                                            "type": "boolean"
+                                        },
+                                        "likes_count": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "deviceToken": []
+                    }
+                ]
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "summary": "Register an anonymous user",
+                "operationId": "1471fc2e9fe942fff835bf5c838f21c5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nickname"
+                                ],
+                                "properties": {
+                                    "nickname": {
+                                        "type": "string",
+                                        "example": "artist_01",
+                                        "maxLength": 50,
+                                        "minLength": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/auth/recover": {
+            "post": {
+                "summary": "Recover account by recovery code",
+                "operationId": "dea2c40c04179bce3dce9d116b4cede3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "recovery_code"
+                                ],
+                                "properties": {
+                                    "recovery_code": {
+                                        "type": "string",
+                                        "example": "ABC123DEF456",
+                                        "maxLength": 12,
+                                        "minLength": 12
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "New token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid recovery code"
+                    }
+                }
+            }
+        },
+        "/admin/artworks/{id}/approve": {
+            "post": {
+                "summary": "Approve an artwork",
+                "operationId": "b224fffad4d485f51724a936b0261580",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Artwork approved"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden (not admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "deviceToken": []
+                    }
+                ]
+            }
+        },
+        "/admin/artworks/{id}/reject": {
+            "post": {
+                "summary": "Reject an artwork",
+                "operationId": "ca56d0f70000b5006d34a4cb36c4095f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Artwork rejected"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden (not admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "deviceToken": []
+                    }
+                ]
+            }
+        },
+        "/admin/moderation-actions": {
+            "get": {
+                "summary": "List moderation actions log",
+                "operationId": "80cf9116ee061cdc1187627355714a17",
+                "responses": {
+                    "200": {
+                        "description": "Paginated moderation log"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden (not admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "deviceToken": []
+                    }
+                ]
+            }
+        },
+        "/project-info/{key}": {
+            "get": {
+                "summary": "Get project info by key",
+                "operationId": "e706776be283caca7302e931bd6a1bb2",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "welcome_text"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project info"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/admin/project-info/{key}": {
+            "put": {
+                "summary": "Update project info (admin only)",
+                "operationId": "eada840cbf02eeea4c236fb087257fe1",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden (not admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "deviceToken": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "deviceToken": {
+                "type": "apiKey",
+                "description": "Anonymous device token for authentication",
+                "name": "X-Device-Token",
+                "in": "header"
+            }
+        }
+    },
+    "tags": []
+}

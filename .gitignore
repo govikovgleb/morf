@@ -1,0 +1,45 @@
+# Environment
+.env
+.env.local
+.env.*.local
+morf_back/.env
+morf_front/.env
+
+# Dependencies
+morf_back/vendor/
+morf_front/node_modules/
+
+# Build outputs
+morf_front/.next/
+morf_front/out/
+morf_front/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Package managers
+.pnpm-store/
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+morf_back/storage/logs/*.log
+
+# Docker
+.dockerignore
+
+# Testing
+morf_back/phpunit.result.cache
+morf_back/coverage/
+
+# Misc
+*.pem
+*.key
+*.crt

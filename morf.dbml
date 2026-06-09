@@ -1,0 +1,181 @@
+// ==========================================
+// Morf — DBML Diagram (v2)
+// UUID, логические связи, денормализация,
+// событийная консистентность, bounded contexts
+// ==========================================
+
+TableGroup identity {
+  users
+}
+
+TableGroup content {
+  reference_categories
+  reference_images
+  reference_sets
+  reference_set_items
+}
+
+TableGroup artworks {
+  artworks
+}
+
+TableGroup engagement {
+  likes
+  comments
+}
+
+TableGroup moderation {
+  moderation_actions
+}
+
+TableGroup static {
+  project_info
+}
+
+// ---------- Identity ----------
+Table users {
+  id uuid [primary key]
+  public_nickname varchar [not null]
+  role varchar [default: 'user', note: 'user | admin']
+  auth_hash varchar [not null, note: 'SHA-256(client_token), хранящегося в localStorage пользователя']
+  recovery_code_hash varchar [note: 'Хеш одноразового кода восстановления при смене устройства']
+  created_at timestamp
+  updated_at timestamp
+
+  Note: 'Анонимный пользователь. Нет email/имени/телефона. Авторизация по токену устройства.'
+}
+
+// ---------- Content ----------
+Table reference_categories {
+  id uuid [primary key]
+  name varchar [not null, note: 'Например: Окружение, Стиль, Руки']
+  slug varchar [not null, unique]
+  sort_order int [default: 0]
+  created_at timestamp
+
+  Note: 'Контекст Content. Типы свойств персонажа.'
+}
+
+Table reference_images {
+  id uuid [primary key]
+  category_id uuid [not null, note: 'Логическая ссылка на reference_categories.id']
+  cdn_url varchar [not null]
+  storage_path varchar [not null]
+  width int
+  height int
+  file_size_bytes int
+  mime_type varchar
+  uploaded_by uuid [note: 'Логическая ссылка на users.id (админ)']
+  created_at timestamp
+
+  Note: 'Контекст Content. Картинки-референсы с метаданными.'
+}
+
+Table reference_sets {
+  id uuid [primary key]
+  title varchar [note: 'Название недели']
+  week_start_date date [note: 'Дата начала недели задания']
+  is_published boolean [default: false]
+  published_at timestamp
+  created_by uuid [note: 'Логическая ссылка на users.id']
+  created_at timestamp
+
+  Note: 'Контекст Content. Набор референсов на неделю.'
+}
+
+Table reference_set_items {
+  id uuid [primary key]
+  set_id uuid [not null, note: 'Логическая ссылка на reference_sets.id']
+  reference_image_id uuid [not null, note: 'Логическая ссылка на reference_images.id']
+  created_at timestamp
+
+  Note: 'Контекст Content. Связь наборов и картинок.'
+}
+
+// ---------- Artworks ----------
+Table artworks {
+  id uuid [primary key]
+  user_id uuid [not null, note: 'Логическая ссылка на users.id']
+  reference_set_id uuid [not null, note: 'Логическая ссылка. Пользователь может выложить несколько работ на один набор']
+  cdn_url varchar [not null]
+  storage_path varchar [not null]
+  width int
+  height int
+  file_size_bytes int
+  mime_type varchar
+  caption text
+  author_nickname varchar [note: 'Денормализованный ник для автономности контекста Artworks']
+  status varchar [default: 'pending', note: 'pending | approved | rejected']
+  likes_count int [default: 0, note: 'Денормализованный счетчик']
+  moderated_by uuid [note: 'Логическая ссылка на users.id (админ)']
+  moderated_at timestamp
+  deleted_at timestamp [note: 'Soft delete для возможности восстановления админом']
+  created_at timestamp
+
+  Note: 'Контекст Artworks. Работы пользователей с модерацией.'
+}
+
+// ---------- Engagement ----------
+Table likes {
+  id uuid [primary key]
+  artwork_id uuid [not null, note: 'Логическая ссылка на artworks.id']
+  user_id uuid [not null, note: 'Логическая ссылка на users.id']
+  created_at timestamp
+
+  indexes {
+    (artwork_id, user_id) [unique, name: 'unique_user_like']
+  }
+
+  Note: 'Контекст Engagement. Лайки работам.'
+}
+
+Table comments {
+  id uuid [primary key]
+  artwork_id uuid [not null, note: 'Логическая ссылка на artworks.id']
+  user_id uuid [not null, note: 'Логическая ссылка на users.id']
+  text text [not null]
+  deleted_at timestamp [note: 'Soft delete']
+  created_at timestamp
+
+  Note: 'Заготовка для будущего функционала. Пока не используется, но заложена на уровне схемы.'
+}
+
+// ---------- Moderation ----------
+Table moderation_actions {
+  id uuid [primary key]
+  target_type varchar [not null, note: 'artwork | comment']
+  target_id uuid [not null, note: 'Логическая ссылка на цель']
+  action varchar [not null, note: 'approve | reject | delete']
+  actor_id uuid [not null, note: 'Логическая ссылка на admin users.id']
+  reason text
+  created_at timestamp
+
+  Note: 'Контекст Moderation. Аудит действий администраторов.'
+}
+
+// ---------- Static ----------
+Table project_info {
+  id uuid [primary key]
+  key varchar [not null, unique, note: 'welcome_text, donation_links, social_links']
+  value text [note: 'JSON или текст']
+  updated_at timestamp
+
+  Note: 'Контекст Static. Описание, донаты, соцсети.'
+}
+
+// ==========================================
+// Логические связи (без физических FOREIGN KEY)
+// ==========================================
+
+Ref: reference_categories.id < reference_images.category_id
+Ref: users.id < reference_images.uploaded_by
+Ref: users.id < reference_sets.created_by
+Ref: reference_sets.id < reference_set_items.set_id
+Ref: reference_images.id < reference_set_items.reference_image_id
+Ref: users.id < artworks.user_id
+Ref: reference_sets.id < artworks.reference_set_id
+Ref: artworks.id < likes.artwork_id
+Ref: users.id < likes.user_id
+Ref: artworks.id < comments.artwork_id
+Ref: users.id < comments.user_id
+Ref: users.id < moderation_actions.actor_id
