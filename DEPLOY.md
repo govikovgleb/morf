@@ -43,9 +43,17 @@ DB_PASSWORD=change_this_password
 
 ### 1.4. Обнови APP_URL
 
+**Если есть домен:**
 ```env
 APP_URL=https://your-domain.ru
 ```
+
+**Если только IP (например 91.227.68.182):**
+```env
+APP_URL=http://91.227.68.182:8080
+```
+
+Порт `:8080` — это порт backend API из `docker-compose.yml`.
 
 ---
 
@@ -100,14 +108,14 @@ cp .env.example .env
 nano .env
 ```
 
-Заполни обязательные поля:
+Заполни обязательные поля (пример для IP 91.227.68.182):
 
 ```env
 APP_NAME=Morf
 APP_ENV=production
 APP_KEY=base64:xxx...xxx
 APP_DEBUG=false
-APP_URL=https://your-domain.ru
+APP_URL=http://91.227.68.182:8080
 
 DB_CONNECTION=pgsql
 DB_HOST=db
@@ -122,6 +130,9 @@ REDIS_PORT=6379
 QUEUE_CONNECTION=redis
 CACHE_STORE=redis
 SESSION_DRIVER=redis
+
+FILESYSTEM_DISK=public
+SANCTUM_STATEFUL_DOMAINS=91.227.68.182:3000,91.227.68.182:8080,localhost:3000
 
 API_HOST=web
 API_PORT=80
@@ -173,11 +184,11 @@ curl http://localhost:3000
 
 ---
 
-## 4. Настройка домена и SSL
+## 4. Настройка домена / IP
 
-### 4.1. На dockerhosting.ru
+### 4.1. Если есть домен
 
-В панели управления:
+В панели управления dockerhosting:
 1. Привяжи домен к серверу
 2. Настрой reverse proxy:
    - `your-domain.ru` → `localhost:3000` (frontend)
@@ -185,9 +196,19 @@ curl http://localhost:3000
 
 Или проще: настрой домен на порт 3000, а API будет проксироваться через Next.js rewrites.
 
-### 4.2. SSL (Let's Encrypt)
+### 4.2. Если только IP (без домена)
 
-На dockerhosting обычно есть авто-SSL в панели. Включи его.
+По IP приложение доступно напрямую:
+- **Frontend**: `http://91.227.68.182:3000`
+- **Backend API**: `http://91.227.68.182:8080`
+
+Проверь что порты 3000 и 8080 открыты в фаерволе dockerhosting (обычно открыты по умолчанию).
+
+SSL по IP нельзя получить от Let's Encrypt. Если нужен HTTPS — купи домен.
+
+### 4.3. SSL (Let's Encrypt)
+
+На dockerhosting обычно есть авто-SSL в панели. Включи его (работает только с доменом).
 
 Если деплоишь руками:
 
@@ -245,7 +266,7 @@ docker compose exec app php artisan config:clear
 - [ ] `.env` создан и заполнен
 - [ ] `APP_KEY` сгенерирован
 - [ ] `DB_PASSWORD` изменён со стандартного
-- [ ] `APP_URL` указывает на твой домен
+- [ ] `APP_URL` указывает на твой домен или IP
 - [ ] `.env` добавлен в `.gitignore` (уже есть)
 - [ ] `vendor/` и `node_modules/` не в git (уже есть)
 - [ ] Репозиторий запушен на GitHub
